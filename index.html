@@ -15,16 +15,23 @@
    
     <div style="height: 80px"></div>
     <main>
-      <h1>Sensor Óptico</h1>
-      <form id="notepad" autocomplete="off">
-        <input
-          id="textbox"
-          spellcheck="false"
-          placeholder="Ingrese el texto"
-          type="text"
-          name="text"
-        />
-      </form>
+      <h1>Object Detection</h1>
+      <video id="video" width="640" height="480" autoplay></video>
+
+      <script>
+        
+        var video = document.querySelector("#video");
+
+       
+        navigator.mediaDevices
+          .getUserMedia({ video: true })
+          .then(function (stream) {
+            video.srcObject = stream;
+          })
+        .catch(function (error) {
+          console.log("Error al obtener la transmisión de la cámara: " + error);
+        });
+    </script>
       <div id="resultado"></div>
       <div>
         <button id="create">Create file</button>
