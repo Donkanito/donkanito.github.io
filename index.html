@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,29 +13,55 @@
   </head>
 
   <body>
-    <div class="containerCctval">
-    </div>
-   
+    <div class="containerCctval"></div>
+
     <div style="height: 80px"></div>
     <main>
       <h1>Object Detection</h1>
-      <video id="video" width="640" height="480" autoplay></video>
-
+      <video hidden id="video" width="832" height="470" autoplay></video>
+      <canvas id="canvas" width="832" height="470"></canvas>
       <script>
-        
         var video = document.querySelector("#video");
 
-       
         navigator.mediaDevices
           .getUserMedia({ video: true })
           .then(function (stream) {
             video.srcObject = stream;
           })
-        .catch(function (error) {
-          console.log("Error al obtener la transmisión de la cámara: " + error);
-        });
-    </script>
-      
+          .catch(function (error) {
+            console.log(
+              "Error al obtener la transmisión de la cámara: " + error
+            );
+          });
+
+        var canvas = document.querySelector("#canvas");
+
+        var snapshotInterval = setInterval(function () {
+          canvas
+            .getContext("2d")
+            .drawImage(video, 0, 0, canvas.width, canvas.height);
+          //let img = canvas;
+          cocoSsd.load().then((model) => {
+            model.detect(canvas).then((predictions) => {
+              //console.log("Predictions: ", predictions);
+              predictions.forEach((prediction) => {
+                const [x, y, width, height] = prediction.bbox;
+                const text = prediction.class;
+                canvas.getContext("2d").strokeStyle = "#00ff00";
+                canvas.getContext("2d").lineWidth = 2;
+                canvas.getContext("2d").beginPath();
+                canvas.getContext("2d").rect(x, y, width, height);
+                canvas.getContext("2d").stroke();
+                canvas.getContext("2d").font = "20px Arial";
+                canvas.getContext("2d").fillStyle = "#00ff00";
+
+                canvas.getContext("2d").fillText(text, x + 5, y - 5);
+              });
+            });
+          });
+        }, 1000 / 24);
+      </script>
     </main>
   </body>
 </html>
+
