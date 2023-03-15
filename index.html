@@ -2,8 +2,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
-<html>
- <head>
+<html lang="en">
+  <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,6 +11,7 @@
     <link href="index.css" rel="stylesheet " />
     
   </head>
+
   <body>
     <div class="containerCctval"></div>
 
@@ -19,7 +20,6 @@
       <h1>Object Detection</h1>
       <video hidden id="video" width="640" height="480" autoplay></video>
       <canvas id="canvas" width="640" height="480"></canvas>
-    
       <script>
         var video = document.querySelector("#video");
 
@@ -29,44 +29,37 @@
             video.srcObject = stream;
           })
           .catch(function (error) {
-            console.log("Error al obtener la transmisión de la cámara: " + error);
+            console.log(
+              "Error al obtener la transmisión de la cámara: " + error
+            );
           });
 
         var canvas = document.querySelector("#canvas");
-        //const model = cocoSsd.load();
-        async function preload() {
-          const aux = await cocoSsd.load();
-          return aux;
-        }
-        
-        let predictions;
-        async function predict(img) {
-          const model = await cocoSsd.load();
-          model.detect(img).then((predictions) => {
-            predictions.forEach((prediction) => {
-              const [x, y, width, height] = prediction.bbox;
-              const text = prediction.class;
-              canvas.getContext("2d").strokeStyle = "#00ff00";
-              canvas.getContext("2d").lineWidth = 2;
-              canvas.getContext("2d").beginPath();
-              canvas.getContext("2d").rect(x, y, width, height);
-              canvas.getContext("2d").stroke();
-              canvas.getContext("2d").font = "20px Arial";
-              canvas.getContext("2d").fillStyle = "#00ff00";
-
-              canvas.getContext("2d").fillText(text, x + 5, y - 5);
-            });
-          });
-        }
 
         var snapshotInterval = setInterval(function () {
           canvas
             .getContext("2d")
             .drawImage(video, 0, 0, canvas.width, canvas.height);
+         
+          cocoSsd.load().then((model) => {
+            model.detect(canvas).then((predictions) => {
+              
+              predictions.forEach((prediction) => {
+                const [x, y, width, height] = prediction.bbox;
+                const text = prediction.class;
+                canvas.getContext("2d").strokeStyle = "#00ff00";
+                canvas.getContext("2d").lineWidth = 2;
+                canvas.getContext("2d").beginPath();
+                canvas.getContext("2d").rect(x, y, width, height);
+                canvas.getContext("2d").stroke();
+                canvas.getContext("2d").font = "20px Arial";
+                canvas.getContext("2d").fillStyle = "#00ff00";
 
-          predict(canvas);
-          
-        }, 1000 / 22);
+                canvas.getContext("2d").fillText(text, x + 5, y - 5);
+              });
+            });
+          });
+        }, 1000 / 24);
       </script>
     </main>
   </body>
