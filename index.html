@@ -38,9 +38,9 @@
           const aux = await cocoSsd.load();
           return aux;
         }
-        //const model = preload();
+        
         let predictions;
-        async function detect(img) {
+        async function predict(img) {
           const model = await cocoSsd.load();
           model.detect(img).then((predictions) => {
             predictions.forEach((prediction) => {
@@ -64,8 +64,8 @@
             .getContext("2d")
             .drawImage(video, 0, 0, canvas.width, canvas.height);
 
-          detect(canvas);
-          //let img = canvas;
+          predict(canvas);
+          
         }, 1000 / 22);
       </script>
     </main>
