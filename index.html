@@ -3,62 +3,71 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Reproducción de instantáneas de la cámara como un video</title>
+ <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Object Detection</title>
+    <link href="index.css" rel="stylesheet " />
+    
   </head>
   <body>
-    <video hidden id="video" width="640" height="480" autoplay></video>
+    <div class="containerCctval"></div>
 
-    <canvas id="canvas" width="640" height="480"></canvas>
+    <div style="height: 80px"></div>
+    <main>
+      <h1>Object Detection</h1>
+      <video hidden id="video" width="640" height="480" autoplay></video>
+      <canvas id="canvas" width="640" height="480"></canvas>
+    
+      <script>
+        var video = document.querySelector("#video");
 
-    <script>
-      var video = document.querySelector("#video");
-
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then(function (stream) {
-          video.srcObject = stream;
-        })
-        .catch(function (error) {
-          console.log("Error al obtener la transmisión de la cámara: " + error);
-        });
-
-      var canvas = document.querySelector("#canvas");
-      //const model = cocoSsd.load();
-      async function preload() {
-        const aux = await cocoSsd.load();
-        return aux;
-      }
-      //const model = preload();
-      let predictions;
-      async function detect(img) {
-        const model = await cocoSsd.load();
-        model.detect(img).then((predictions) => {
-          predictions.forEach((prediction) => {
-            const [x, y, width, height] = prediction.bbox;
-            const text = prediction.class;
-            canvas.getContext("2d").strokeStyle = "#00ff00";
-            canvas.getContext("2d").lineWidth = 2;
-            canvas.getContext("2d").beginPath();
-            canvas.getContext("2d").rect(x, y, width, height);
-            canvas.getContext("2d").stroke();
-            canvas.getContext("2d").font = "20px Arial";
-            canvas.getContext("2d").fillStyle = "#00ff00";
-
-            canvas.getContext("2d").fillText(text, x + 5, y - 5);
+        navigator.mediaDevices
+          .getUserMedia({ video: true })
+          .then(function (stream) {
+            video.srcObject = stream;
+          })
+          .catch(function (error) {
+            console.log("Error al obtener la transmisión de la cámara: " + error);
           });
-        });
-      }
 
-      var snapshotInterval = setInterval(function () {
-        canvas
-          .getContext("2d")
-          .drawImage(video, 0, 0, canvas.width, canvas.height);
+        var canvas = document.querySelector("#canvas");
+        //const model = cocoSsd.load();
+        async function preload() {
+          const aux = await cocoSsd.load();
+          return aux;
+        }
+        //const model = preload();
+        let predictions;
+        async function detect(img) {
+          const model = await cocoSsd.load();
+          model.detect(img).then((predictions) => {
+            predictions.forEach((prediction) => {
+              const [x, y, width, height] = prediction.bbox;
+              const text = prediction.class;
+              canvas.getContext("2d").strokeStyle = "#00ff00";
+              canvas.getContext("2d").lineWidth = 2;
+              canvas.getContext("2d").beginPath();
+              canvas.getContext("2d").rect(x, y, width, height);
+              canvas.getContext("2d").stroke();
+              canvas.getContext("2d").font = "20px Arial";
+              canvas.getContext("2d").fillStyle = "#00ff00";
 
-        detect(canvas);
-        //let img = canvas;
-      }, 1000 / 20);
-    </script>
+              canvas.getContext("2d").fillText(text, x + 5, y - 5);
+            });
+          });
+        }
+
+        var snapshotInterval = setInterval(function () {
+          canvas
+            .getContext("2d")
+            .drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          detect(canvas);
+          //let img = canvas;
+        }, 1000 / 22);
+      </script>
+    </main>
   </body>
 </html>
